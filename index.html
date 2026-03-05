@@ -271,15 +271,7 @@
     background: var(--bg3);
   }
 
-  .news-card.featured {
-    grid-column: span 2;
-  }
-
-  /* Featured card with thumb → horizontal layout */
-  .news-card.featured.has-thumb {
-    flex-direction: row;
-    gap: 0;
-  }
+  /* No featured card — all cards uniform */
 
   .card-body {
     display: flex;
@@ -289,9 +281,7 @@
     min-width: 0;
   }
 
-  .news-card.featured.has-thumb .card-body {
-    padding-right: 24px;
-  }
+  /* (removed featured card body padding) */
 
   /* Thumbnail */
   .card-thumb {
@@ -312,12 +302,7 @@
     margin: 4px -28px -28px;
   }
 
-  /* Featured: thumb on right side */
-  .news-card.featured .card-thumb {
-    width: 40%;
-    min-height: 200px;
-    margin: -28px -28px -28px 0;
-  }
+  /* (removed featured thumb side layout) */
 
   .card-source {
     display: flex;
@@ -371,9 +356,7 @@
     letter-spacing: -0.01em;
   }
 
-  .news-card.featured .card-title {
-    font-size: 22px;
-  }
+  /* (removed featured title size override) */
 
   .card-desc {
     font-size: 13px;
@@ -386,9 +369,7 @@
     flex: 1;
   }
 
-  .news-card.featured .card-desc {
-    -webkit-line-clamp: 5;
-  }
+  /* (removed featured desc clamp override) */
 
   .card-arrow {
     align-self: flex-end;
@@ -470,13 +451,16 @@
   @media (max-width: 900px) {
     header, .hero, .tab-nav, main, footer { padding-left: 24px; padding-right: 24px; }
     .news-grid { grid-template-columns: 1fr; }
-    .news-card.featured { grid-column: span 1; }
-    .news-card.featured.has-thumb { flex-direction: column; }
-    .news-card.featured.has-thumb .card-body { padding-right: 0; }
-    .news-card.featured .card-thumb {
-      width: 100%;
-      min-height: 160px;
-      margin: 4px -28px -28px;
+    /* Hide tab count badges on mobile */
+    .tab-count { display: none; }
+    /* Section header: stack vertically, pills right-aligned */
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .source-pills {
+      align-self: flex-end;
     }
   }
 </style>
@@ -758,8 +742,7 @@
 
     const dotClass = type === 'ai' ? 'dot-ai' : 'dot-design';
 
-    grid.innerHTML = items.map((item, i) => {
-      const isFeatured = i === 0;
+    grid.innerHTML = items.map((item) => {
       const thumbHtml = item.thumb
         ? `<div class="card-thumb"><img src="${item.thumb}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
         : '';
@@ -767,7 +750,7 @@
         ? `<span class="paywall-badge">SUBSCRIPTION</span>`
         : '';
       return `
-      <a class="news-card${isFeatured ? ' featured' : ''}${item.thumb ? ' has-thumb' : ''}" href="${item.url}" target="_blank" rel="noopener">
+      <a class="news-card${item.thumb ? ' has-thumb' : ''}" href="${item.url}" target="_blank" rel="noopener">
         <div class="card-body">
           <div class="card-source">
             <div class="source-dot ${dotClass}"></div>
