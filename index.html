@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morning Brief — AI & Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Syne:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --bg2: #141414;
+    --bg3: #1c1c1c;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0ede6;
+    --muted: #7a7670;
+    --ai-accent: #c8a96e;
+    --design-accent: #7eb8a4;
+    --tag-ai: rgba(200, 169, 110, 0.12);
+    --tag-design: rgba(126, 184, 164, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .logo span {
+    color: var(--ai-accent);
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  #live-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .refresh-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .refresh-btn:hover {
+    border-color: var(--ai-accent);
+    color: var(--ai-accent);
+  }
+
+  /* Hero section */
+  .hero {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 56px 48px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--ai-accent);
+    transition: color 0.3s ease;
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  /* Tab nav */
+  .tab-nav {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn.active-ai {
+    color: var(--ai-accent);
+    border-bottom-color: var(--ai-accent);
+  }
+
+  .tab-btn.active-design {
+    color: var(--design-accent);
+    border-bottom-color: var(--design-accent);
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+  }
+
+  .tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 10px;
+    margin-left: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .count-ai { background: var(--tag-ai); color: var(--ai-accent); }
+  .count-design { background: var(--tag-design); color: var(--design-accent); }
+
+  /* Main layout */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+  }
+
+  /* Section */
+  .section {
+    display: none;
+    padding-top: 48px;
+  }
+
+  .section.visible {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .section-label.ai { color: var(--ai-accent); }
+  .section-label.design { color: var(--design-accent); }
+
+  .source-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .source-pill {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* News grid */
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .news-card {
+    background: var(--bg);
+    padding: 28px;
+    transition: background 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .news-card:hover {
+    background: var(--bg3);
+  }
+
+  .news-card.featured {
+    grid-column: span 2;
+  }
+
+  /* Featured card with thumb → horizontal layout */
+  .news-card.featured.has-thumb {
+    flex-direction: row;
+    gap: 0;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .news-card.featured.has-thumb .card-body {
+    padding-right: 24px;
+  }
+
+  /* Thumbnail */
+  .card-thumb {
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Non-featured: thumb at bottom */
+  .news-card:not(.featured) .card-thumb {
+    height: 120px;
+    margin: 4px -28px -28px;
+  }
+
+  /* Featured: thumb on right side */
+  .news-card.featured .card-thumb {
+    width: 40%;
+    min-height: 200px;
+    margin: -28px -28px -28px 0;
+  }
+
+  .card-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .source-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-ai { background: var(--ai-accent); }
+  .dot-design { background: var(--design-accent); }
+
+  .source-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .paywall-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: rgba(220, 140, 60, 0.15);
+    color: #dc8c3c;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .card-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .news-card.featured .card-title {
+    font-size: 22px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .news-card.featured .card-desc {
+    -webkit-line-clamp: 5;
+  }
+
+  .card-arrow {
+    align-self: flex-end;
+    font-size: 16px;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .news-card:hover .card-arrow {
+    opacity: 1;
+    transform: translate(2px, -2px);
+  }
+
+  /* Loading state */
+  .loading-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    gap: 16px;
+    color: var(--muted);
+    background: var(--bg);
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--ai-accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .spinner.design-spin { border-top-color: var(--design-accent); }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Error state */
+  .error-state {
+    grid-column: 1 / -1;
+    background: var(--bg);
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 900px) {
+    header, .hero, .tab-nav, main, footer { padding-left: 24px; padding-right: 24px; }
+    .news-grid { grid-template-columns: 1fr; }
+    .news-card.featured { grid-column: span 1; }
+    .news-card.featured.has-thumb { flex-direction: column; }
+    .news-card.featured.has-thumb .card-body { padding-right: 0; }
+    .news-card.featured .card-thumb {
+      width: 100%;
+      min-height: 160px;
+      margin: 4px -28px -28px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Morning<span>Brief</span></div>
+    <div class="header-meta">
+      <div id="live-time">—</div>
+      <button class="refresh-btn" onclick="loadAll()">↻ REFRESH</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-date" id="hero-date">—</div>
+  <h1 class="hero-title">Your daily<br><em>AI & Design</em><br>briefing.</h1>
+  <p class="hero-sub">Curated from the world's most authoritative sources — updated every morning.</p>
+</div>
+
+<nav class="tab-nav">
+  <button class="tab-btn active-ai" onclick="showTab('ai')" id="tab-ai">
+    Artificial Intelligence
+    <span class="tab-count count-ai" id="count-ai">—</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('design')" id="tab-design">
+    Design
+    <span class="tab-count count-design" id="count-design">—</span>
+  </button>
+</nav>
+
+<main>
+  <!-- AI Section -->
+  <section class="section visible" id="section-ai">
+    <div class="section-header">
+      <div class="section-label ai">↗ AI Intelligence Feed</div>
+      <div class="source-pills">
+        <span class="source-pill">MIT Tech Review</span>
+        <span class="source-pill">The Verge AI</span>
+        <span class="source-pill">TechCrunch</span>
+        <span class="source-pill">Ars Technica</span>
+      </div>
+    </div>
+    <div class="news-grid" id="grid-ai">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching AI news...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Section -->
+  <section class="section" id="section-design">
+    <div class="section-header">
+      <div class="section-label design">↗ Design Intelligence Feed</div>
+      <div class="source-pills">
+        <span class="source-pill">It's Nice That</span>
+        <span class="source-pill">Smashing Magazine</span>
+        <span class="source-pill">Creative Bloq</span>
+        <span class="source-pill">CSS-Tricks</span>
+      </div>
+    </div>
+    <div class="news-grid" id="grid-design">
+      <div class="loading-state">
+        <div class="spinner design-spin"></div>
+        <div class="loading-text">Fetching design news...</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-text">Sources: MIT Tech Review · The Verge · TechCrunch · Ars Technica · It's Nice That · Smashing Magazine · Creative Bloq · CSS-Tricks</div>
+  <div class="footer-text" id="last-updated">—</div>
+</footer>
+
+<script>
+  // ─── Config ───────────────────────────────────────────────────
+  const AI_FEEDS = [
+    { name: 'The Verge AI',    url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
+    { name: 'Ars Technica',    url: 'https://feeds.arstechnica.com/arstechnica/index' },
+    { name: 'MIT Tech Review', url: 'https://www.technologyreview.com/feed/', paywall: true },
+    { name: 'TechCrunch',      url: 'https://techcrunch.com/feed/' },
+  ];
+
+  const DESIGN_FEEDS = [
+    { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/' },
+    { name: "It's Nice That",   url: 'https://feeds.feedburner.com/itsnicethat/SlXC' },
+    { name: 'Creative Bloq',    url: 'https://www.creativebloq.com/feeds/all.xml' },
+    { name: 'CSS-Tricks',       url: 'https://css-tricks.com/feed/' },
+  ];
+
+  // CORS proxy fallback chain — each is independent, so if one dies the others still work
+  const CORS_PROXIES = [
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  ];
+
+  // rss2json as a secondary fallback (returns JSON, not XML)
+  const RSS2JSON_URL = url => `https://api.rss2json.com/v1/api.json?count=6&rss_url=${encodeURIComponent(url)}`;
+
+  // ─── Time ─────────────────────────────────────────────────────
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('live-time').textContent =
+      now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      + ' · ' + now.toLocaleDateString('en-US', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+
+    document.getElementById('hero-date').textContent =
+      now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+  }
+
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  // ─── Tab switching ────────────────────────────────────────────
+  let activeTab = 'ai';
+
+  function showTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active-ai', 'active-design');
+    });
+    document.getElementById(`section-${tab}`).classList.add('visible');
+    document.getElementById(`tab-${tab}`).classList.add(`active-${tab}`);
+    // Hero title color follows active tab
+    document.querySelector('.hero-title em').style.color =
+      tab === 'design' ? 'var(--design-accent)' : 'var(--ai-accent)';
+  }
+
+  // ─── Utilities ────────────────────────────────────────────────
+  function stripHtml(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html || '';
+    return d.textContent || d.innerText || '';
+  }
+
+  function relTime(dateStr) {
+    if (!dateStr) return '';
+    const diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 0) return 'just now';
+    if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  }
+
+  // ─── Extract thumbnail from an XML element ─────────────────────
+  function extractThumb(el) {
+    // media:content or media:thumbnail
+    const media = el.querySelector('content[url], thumbnail[url]');
+    if (media) {
+      const url = media.getAttribute('url');
+      if (url && /\.(jpg|jpeg|png|webp|gif)/i.test(url)) return url;
+      // media:content might not have extension but could be image type
+      if (url && media.getAttribute('medium') === 'image') return url;
+      if (url && (media.getAttribute('type') || '').startsWith('image/')) return url;
+    }
+    // enclosure with image type
+    const enc = el.querySelector('enclosure[type^="image"]');
+    if (enc) return enc.getAttribute('url') || '';
+    // Fallback: find <img> in description or content:encoded
+    const htmlContent = el.querySelector('description')?.textContent ||
+                        el.querySelector('content')?.textContent || '';
+    const imgMatch = htmlContent.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (imgMatch) return imgMatch[1];
+    return '';
+  }
+
+  // ─── Native RSS/Atom XML parser ───────────────────────────────
+  function parseRSSXml(xmlText, feedName, feedPaywall) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, 'text/xml');
+
+    if (doc.querySelector('parsererror')) return [];
+
+    let items = [];
+
+    // Try RSS 2.0 format: <item>
+    const rssItems = doc.querySelectorAll('item');
+    if (rssItems.length) {
+      rssItems.forEach(item => {
+        items.push({
+          source: feedName,
+          paywall: !!feedPaywall,
+          title: (item.querySelector('title')?.textContent || '').trim(),
+          desc: stripHtml(
+            item.querySelector('description')?.textContent ||
+            item.querySelector('content\\:encoded')?.textContent || ''
+          ).slice(0, 350),
+          url: item.querySelector('link')?.textContent?.trim() || '#',
+          date: item.querySelector('pubDate')?.textContent ||
+                item.querySelector('dc\\:date')?.textContent || '',
+          thumb: extractThumb(item),
+        });
+      });
+      return items.slice(0, 4);
+    }
+
+    // Try Atom format: <entry>
+    const atomEntries = doc.querySelectorAll('entry');
+    if (atomEntries.length) {
+      atomEntries.forEach(entry => {
+        const link = entry.querySelector('link[rel="alternate"]') ||
+                     entry.querySelector('link');
+        items.push({
+          source: feedName,
+          paywall: !!feedPaywall,
+          title: (entry.querySelector('title')?.textContent || '').trim(),
+          desc: stripHtml(
+            entry.querySelector('summary')?.textContent ||
+            entry.querySelector('content')?.textContent || ''
+          ).slice(0, 350),
+          url: link?.getAttribute('href') || '#',
+          date: entry.querySelector('published')?.textContent ||
+                entry.querySelector('updated')?.textContent || '',
+          thumb: extractThumb(entry),
+        });
+      });
+      return items.slice(0, 4);
+    }
+
+    return [];
+  }
+
+  // ─── Fetch one feed with proxy fallbacks ──────────────────────
+  async function fetchFeed(feed) {
+    // Strategy 1: CORS proxy + native XML parsing
+    for (const proxyFn of CORS_PROXIES) {
+      try {
+        const res = await fetch(proxyFn(feed.url), { signal: AbortSignal.timeout(15000) });
+        if (!res.ok) continue;
+        const text = await res.text();
+        if (!text.includes('<') || text.includes('<!DOCTYPE html')) continue;
+        const items = parseRSSXml(text, feed.name, feed.paywall);
+        if (items.length) return items;
+      } catch { continue; }
+    }
+
+    // Strategy 2: rss2json service (returns JSON directly, no XML parsing needed)
+    try {
+      const res = await fetch(RSS2JSON_URL(feed.url), { signal: AbortSignal.timeout(15000) });
+      const data = await res.json();
+      if (data.status === 'ok' && data.items?.length) {
+        return data.items.slice(0, 4).map(item => ({
+          source: feed.name,
+          paywall: !!feed.paywall,
+          title: (item.title || '').trim(),
+          desc: stripHtml(item.description || item.content || '').slice(0, 350),
+          url: item.link || '#',
+          date: item.pubDate || '',
+          thumb: item.thumbnail || item.enclosure?.link || '',
+        }));
+      }
+    } catch { /* continue */ }
+
+    console.warn(`[MorningBrief] All proxies failed for: ${feed.name}`);
+    return [];
+  }
+
+  // ─── Fetch feeds sequentially to avoid proxy rate-limits ──────
+  async function fetchFeedsSequentially(feeds) {
+    const results = [];
+    for (const feed of feeds) {
+      results.push(await fetchFeed(feed));
+    }
+    return results;
+  }
+
+  // ─── Render cards ─────────────────────────────────────────────
+  function renderCards(items, gridId, type) {
+    const grid = document.getElementById(gridId);
+
+    if (!items.length) {
+      grid.innerHTML = `<div class="error-state">Unable to load feeds — check your connection and try refreshing.</div>`;
+      return;
+    }
+
+    const dotClass = type === 'ai' ? 'dot-ai' : 'dot-design';
+
+    grid.innerHTML = items.map((item, i) => {
+      const isFeatured = i === 0;
+      const thumbHtml = item.thumb
+        ? `<div class="card-thumb"><img src="${item.thumb}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+        : '';
+      const paywallBadge = item.paywall
+        ? `<span class="paywall-badge">SUBSCRIPTION</span>`
+        : '';
+      return `
+      <a class="news-card${isFeatured ? ' featured' : ''}${item.thumb ? ' has-thumb' : ''}" href="${item.url}" target="_blank" rel="noopener">
+        <div class="card-body">
+          <div class="card-source">
+            <div class="source-dot ${dotClass}"></div>
+            <div class="source-name">${item.source}</div>
+            ${paywallBadge}
+            <div class="card-date">${relTime(item.date)}</div>
+          </div>
+          <div class="card-title">${item.title}</div>
+          <div class="card-desc">${item.desc}</div>
+          <div class="card-arrow">↗</div>
+        </div>
+        ${thumbHtml}
+      </a>`;
+    }).join('');
+
+    document.getElementById(`count-${type}`).textContent = items.length;
+  }
+
+  // ─── Load all ─────────────────────────────────────────────────
+  async function loadAll() {
+    document.getElementById('grid-ai').innerHTML = `<div class="loading-state"><div class="spinner"></div><div class="loading-text">Fetching AI news...</div></div>`;
+    document.getElementById('grid-design').innerHTML = `<div class="loading-state"><div class="spinner design-spin"></div><div class="loading-text">Fetching design news...</div></div>`;
+
+    // Fetch feeds sequentially per category to avoid proxy rate-limits
+    // But run both categories in parallel (each category's feeds are sequential)
+    const aiPromise = fetchFeedsSequentially(AI_FEEDS).then(r => {
+      renderCards(r.flat().slice(0, 9), 'grid-ai', 'ai');
+    });
+    const designPromise = fetchFeedsSequentially(DESIGN_FEEDS).then(r => {
+      renderCards(r.flat().slice(0, 9), 'grid-design', 'design');
+    });
+    await Promise.all([aiPromise, designPromise]);
+
+    document.getElementById('last-updated').textContent =
+      'Last updated: ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────
+  loadAll();
+</script>
+</body>
+</html>
