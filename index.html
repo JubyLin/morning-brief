@@ -451,6 +451,9 @@
   @media (max-width: 900px) {
     header, .hero, .tab-nav, main, footer { padding-left: 24px; padding-right: 24px; }
     .news-grid { grid-template-columns: 1fr; }
+    /* Header: hide logo, time + refresh spread full width */
+    .logo { display: none; }
+    .header-meta { width: 100%; justify-content: space-between; }
     /* Hide tab count badges on mobile */
     .tab-count { display: none; }
     /* Section header: stack vertically, pills right-aligned */
@@ -462,7 +465,7 @@
     .source-pills {
       align-self: flex-end;
     }
-    /* Footer: stack vertically, hide sources list */
+    /* Footer: hide sources list */
     footer {
       flex-direction: column;
       gap: 0;
